@@ -1,1 +1,12 @@
 /* CSS declarations go here */
+canvas {
+  display: inline-block;
+  border: 3px solid #333;
+  margin: auto;
+  background: #FFF;
+}
+body {
+  text-align: center;
+  margin-top: 50px;
+  background-color: #303030;
+}
