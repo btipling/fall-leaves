@@ -1,6 +1,6 @@
 if (Meteor.isClient) {
   var C_WIDTH = 1300,
-    C_HEIGHT = 700;
+    C_HEIGHT = 700, c, cd;
 
   // counter starts at 0
   Session.setDefault("counter", 0);
@@ -12,18 +12,18 @@ if (Meteor.isClient) {
   });
 
   function genBG(baseImage) {
-    var c = $("#canvas-bg");
-    c.height(C_HEIGHT);
-    c.width(C_WIDTH);
     Session.set("counter",Session.get("counter") + 1);
-    generateBG(c.get(0), C_WIDTH, C_HEIGHT, baseImage);
+    generateBG(cd, C_WIDTH, C_HEIGHT, baseImage);
     requestAnimationFrame(genBG.bind(null, baseImage));
   }
 
   function drawBaseBG() {
-    var baseImage = new Image(),
-      c = $("#canvas-bg").get(0), context;
-    context = c.getContext("2d");
+    var baseImage = new Image(), context;
+    c = $("#canvas-bg");
+    cd = c.get(0);
+    c.height(C_HEIGHT);
+    c.width(C_WIDTH);
+    context = cd.getContext("2d");
     baseImage.src = "fall_bg.jpg";
     baseImage.onload = function(){
       genBG(baseImage);

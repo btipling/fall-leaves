@@ -17,40 +17,67 @@ var colors = [
 var shapes = [
 ];
 
+var breeze;
+
+var MAX_SHAPES = 10;
+var currentMax = MAX_SHAPES;
+
 generateBG = function (canvas, width, height, baseImage) {
-  var i, context = canvas.getContext("2d"), coords, shouldRotate;
+  var i, context = canvas.getContext("2d"), coords, shouldRotate, rotSpeed,
+      genBreeze = false;
+  if (!breeze && rand(0, 100) === 0) {
+    breeze = rand(100, 200);
+    genBreeze = true;
+  } else if (breeze) {
+    currentMax = MAX_SHAPES + breeze;
+    breeze -= 1;
+  }
   context.imageSmoothingEnabled = true;
   context.lineWidth = 0.9;
   context.clearRect(0, 0, width, height);
   context.drawImage(baseImage, 0, 0);
-  if (rand(0, 2) === 0) {
-    shapes.push(generateShape(-30, rand(0, height)));
-  } else {
-    shapes.push(generateShape(rand(0, width), -30));
+  if (shapes.length < currentMax) {
+    if (rand(0, 2) === 0) {
+      shapes.push(generateShape(-30, rand(0, height)));
+    } else {
+      shapes.push(generateShape(rand(0, width), -30));
+    }
   }
   shouldRotate = (Session.get("counter") % 2) === 0;
   for (i = 0; i < shapes.length; i++) {
+    if (genBreeze) {
+      shapes[i].xMoveModifier = rand(0, 2);
+      shapes[i].yMoveModifier = rand(0, 2) * -1;
+    } else if (breeze && breeze < 10) {
+      if (rand(0, 1)) {
+        shapes[i].yMoveModifier = 0;
+      }
+    }
     moveDown(shapes[i]);
     if (shouldRotate) {
-      rotateTriangle(shapes[i].rotationSpeed * shapes[i].rotationDirection, shapes[i]);
+      rotSpeed = shapes[i].rotationSpeed;
+      rotSpeed = breeze ? rotSpeed * 2 : rotSpeed;
+      rotateTriangle(rotSpeed * shapes[i].rotationDirection, shapes[i]);
     }
     drawTriangle(context, shapes[i]);
   }
   shapes = shapes.filter(function (shape) {
-    if (shape.center[1] > height + 50) {
+    if (shape.center[1] > height + 500) {
       return false;
     }
-    return shape.center[0] <= width + 50;
+    return shape.center[0] <= width + 500;
   });
 }
 
 function moveDown(shape) {
-  shape.coords.forEach(function (coords) {
-    coords[0] += 1;
-    coords[1] += 1;
-  });
-  shape.center[0] += 1;
-  shape.center[1] += 1;
+  var i, len, xMov = shape.xMov + shape.xMoveModifier,
+      yMov = shape.yMov + shape.yMoveModifier;
+  for (i - 0, len = shape.coords.length; i < len; i++) {
+    shape.coords[i][0] += xMov;
+    shape.coords[i][1] += yMov;
+  }
+  shape.center[0] += xMov;
+  shape.center[1] += yMov;
 }
 
 function drawTriangle(context, shape) {
@@ -103,6 +130,10 @@ function generateShape(x, y) {
   shape.rotation = rand(0, 360);
   shape.rotationSpeed = rand(1, 10)/100;
   shape.rotationDirection = rand(1, 0) ? 1 : -1;
+  shape.xMov = rand(1, 3);
+  shape.xMoveModifier = 0;
+  shape.yMov = rand(2, 4);
+  shape.yMoveModifier = 0;
   return shape;
 }
 
