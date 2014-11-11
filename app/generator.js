@@ -1,105 +1,120 @@
 var colors = [
-  "f5a8fa",
-  "f8d1fa",
-  "faa8ac",
-  "fad1d4",
-  "f5faa8",
-  "f8fad1",
-  "b1faa8",
-  "b9cbff",
-  "b8ebff",
+  "f05d00",
+  "d64c05",
+  "f91700",
+  "d00000",
+  "fae365",
+  "e07e00",
+  "d8a14b",
+  "af6710",
+  "9d682d",
+  "240718",
+  "61160a",
+  "5c0700",
+  "5c0700",
 ];
 
-var triangles = [
+var shapes = [
 ];
 
-generateBG = function (canvas, width, height) {
+generateBG = function (canvas, width, height, baseImage) {
   var i, context = canvas.getContext("2d"), coords, shouldRotate;
   context.imageSmoothingEnabled = true;
   context.lineWidth = 0.9;
   context.clearRect(0, 0, width, height);
+  context.drawImage(baseImage, 0, 0);
   if (rand(0, 2) === 0) {
-    triangles.push(generateTriangle(-30, rand(0, height)));
+    shapes.push(generateShape(-30, rand(0, height)));
   } else {
-    triangles.push(generateTriangle(rand(0, width), -30));
+    shapes.push(generateShape(rand(0, width), -30));
   }
   shouldRotate = (Session.get("counter") % 2) === 0;
-  console.log("shouldRotate", shouldRotate);
-  for (i = 0; i < triangles.length; i++) {
-    moveDown(triangles[i]);
+  for (i = 0; i < shapes.length; i++) {
+    moveDown(shapes[i]);
     if (shouldRotate) {
-      rotateTriangle(triangles[i].rotationSpeed * triangles[i].rotationDirection, triangles[i]);
+      rotateTriangle(shapes[i].rotationSpeed * shapes[i].rotationDirection, shapes[i]);
     }
-    drawTriangle(context, triangles[i]);
+    drawTriangle(context, shapes[i]);
   }
-  triangles = triangles.filter(function (triangle) {
-    if (triangle.center[1] > height + 50) {
+  shapes = shapes.filter(function (shape) {
+    if (shape.center[1] > height + 50) {
       return false;
     }
-    return triangle.center[0] <= width + 50;
+    return shape.center[0] <= width + 50;
   });
-  console.log("num triangles", triangles.length);
 }
 
-function moveDown(triangle) {
-  triangle.coords.forEach(function (coords) {
+function moveDown(shape) {
+  shape.coords.forEach(function (coords) {
     coords[0] += 1;
     coords[1] += 1;
   });
-  triangle.center[0] += 1;
-  triangle.center[1] += 1;
+  shape.center[0] += 1;
+  shape.center[1] += 1;
 }
 
-function drawTriangle(context, triangle) {
+function drawTriangle(context, shape) {
   context.beginPath();
-  context.fillStyle = "#" + colors[triangle.color];
-  context.moveTo(triangle.coords[0][0], triangle.coords[0][1]);
-  context.lineTo(triangle.coords[1][0], triangle.coords[1][1]);
-  context.lineTo(triangle.coords[2][0], triangle.coords[2][1]);
-  context.lineTo(triangle.coords[0][0], triangle.coords[0][1]);
+  context.fillStyle = "#" + colors[shape.color];
+  shape.coords.forEach(function(coords, index) {
+    if (!index) {
+      context.moveTo(coords[0], coords[1]);
+    } else {
+      context.lineTo(coords[0], coords[1]);
+    }
+  });
+  context.lineTo(shape.coords[0][0], shape.coords[0][1]);
   context.fill();
 }
 
-function generateTriangle(x, y) {
-  //generate triangle:
-  var sideA, sideB, sideC, m, coords, angle, triangle = {};
+function generateShape(x, y) {
+  //generate shape:
+  var sideA, sideB, sideC, m, coords, angle, shape = {};
+
   coords = [[x,y]];
-  triangle.coords = coords;
-  triangle.color = rand(0, colors.length-1);
+  shape.coords = coords;
+
+  shape.color = rand(0, colors.length-1);
+
   sideA = rand(10, 50);
-  triangle.sideA = sideA;
+  shape.sideA = sideA;
+
   sideB = rand(10, 50);
-  triangle.sideB = sideB;
+  shape.sideB = sideB;
+
   sideC = Math.sqrt(Math.pow(sideA, 2) + Math.pow(sideB, 2));
-  triangle.sideC = sideC;
+  shape.sideC = sideC;
+
   angle = rand(30, 90);
-  triangle.angle = angle;
-  coords.push([x + sideA, y]);
+  shape.angle = angle;
   m = Math.tan(angle);
-  triangle.m = m;
+  shape.m = m;
+
+  coords.push([x + sideA, y]);
   coords.push([
       Math.round(x + (sideB/(Math.sqrt(1 + Math.pow(m,2))))),
       Math.round(y + ((sideB*m)/(Math.sqrt(1 + Math.pow(m,2))))),
   ]);
-  triangle.center = [
+
+  shape.center = [
     (coords[0][0] + coords[1][0] + coords[2][0])/3,
     (coords[1][1] + coords[1][1] + coords[2][1])/3,
   ];
-  triangle.rotation = rand(0, 360);
-  triangle.rotationSpeed = rand(1, 10)/100;
-  triangle.rotationDirection = rand(1, 0) ? 1 : -1;
-  return triangle;
+  shape.rotation = rand(0, 360);
+  shape.rotationSpeed = rand(1, 10)/100;
+  shape.rotationDirection = rand(1, 0) ? 1 : -1;
+  return shape;
 }
 
 
 
-function rotateTriangle(rotation, triangle) {
+function rotateTriangle(rotation, shape) {
   var mx, my, cosRot = Math.cos(rotation),
       sinRot = Math.sin(rotation);
-  cx = triangle.center[0];
-  cy = triangle.center[1];
+  cx = shape.center[0];
+  cy = shape.center[1];
   //apply change for origin to a,b,c to move them.
-  triangle.coords.forEach(function (coords, i) {
+  shape.coords.forEach(function (coords, i) {
     var x, y;
     // centering coords:
     x = coords[0] - cx;
