@@ -11,10 +11,10 @@ if (Meteor.isClient) {
     }
   });
 
-  function genBG(baseImage) {
+  function genBG(swan, bg) {
     Session.set("counter",Session.get("counter") + 1);
-    generateBG(cd, C_WIDTH, C_HEIGHT, baseImage);
-    requestAnimationFrame(genBG.bind(null, baseImage));
+    generateBG(cd, C_WIDTH, C_HEIGHT, swan, bg);
+    requestAnimationFrame(genBG.bind(null, swan, bg));
   }
 
   function drawBaseBG() {
@@ -26,7 +26,15 @@ if (Meteor.isClient) {
     context = cd.getContext("2d");
     baseImage.src = "fall_bg.jpg";
     baseImage.onload = function(){
-      genBG(baseImage);
+      drawSwan(baseImage);
+    }
+  }
+
+  function drawSwan(bg) {
+    var swan = new Image();
+    swan.src = "swan.png";
+    swan.onload = function(){
+      genBG(swan, bg);
     }
   }
 
