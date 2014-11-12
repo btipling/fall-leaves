@@ -21,26 +21,29 @@ var breeze;
 
 var MAX_SHAPES = 10;
 var currentMax = MAX_SHAPES;
-var swanX = 1000;
+var swanX = null;
 
 generateBG = function (canvas, width, height, swan, bg) {
   var i, context = canvas.getContext("2d"), coords, shouldRotate, rotSpeed,
       genBreeze = false;
+  if (swanX === null || swanX < 0) {
+    swanX = .9;
+  }
   if (!breeze && rand(0, 100) === 0) {
     breeze = rand(100, 200);
     genBreeze = true;
   } else if (breeze) {
     currentMax = MAX_SHAPES + breeze;
     breeze -= 1;
-    swanX -= 0.04;
+    swanX -= 0.00002;
   } else {
-    swanX -= 0.05;
+    swanX -= 0.00004;
   }
   context.imageSmoothingEnabled = true;
   context.lineWidth = 0.9;
   context.clearRect(0, 0, width, height);
-  context.drawImage(bg, 0, 0);
-  context.drawImage(swan, swanX, 650);
+  context.drawImage(bg, 0, 0, width, height);
+  context.drawImage(swan, width*swanX, height*.935, width*0.0384, height*0.1);
   if (shapes.length < currentMax) {
     if (rand(0, 2) === 0) {
       shapes.push(generateShape(-30, rand(0, height)));

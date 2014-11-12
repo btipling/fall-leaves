@@ -5,8 +5,12 @@ canvas {
   margin: auto;
   background: #FFF;
 }
+html {
+  height: 100%;
+}
 body {
+  min-height: 100%;
   text-align: center;
-  margin-top: 50px;
+  margin-top: 0px;
   background-color: #303030;
 }
