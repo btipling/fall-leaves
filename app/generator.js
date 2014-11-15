@@ -19,7 +19,7 @@ var shapes = [
 
 var breeze;
 
-var MAX_SHAPES = 10;
+var MAX_SHAPES = 20;
 var currentMax = MAX_SHAPES;
 var swanX = null;
 
@@ -54,11 +54,13 @@ generateBG = function (canvas, width, height, swan, bg) {
   shouldRotate = (Session.get("counter") % 2) === 0;
   for (i = 0; i < shapes.length; i++) {
     if (genBreeze) {
-      shapes[i].xMoveModifier = rand(0, 2);
-      shapes[i].yMoveModifier = rand(0, 2) * -1;
+      shapes[i].xMoveModifier = rand(1, 4);
+      shapes[i].yMoveModifier = rand(1, 4) * -1;
     } else if (breeze && breeze < 10) {
       if (rand(0, 1)) {
-        shapes[i].yMoveModifier = 0;
+        if (shapes[i].yMoveModifier) {
+          shapes[i].yMoveModifier = shapes[i].yMoveModifier/2;
+        }
       }
     }
     moveDown(shapes[i]);
@@ -70,10 +72,10 @@ generateBG = function (canvas, width, height, swan, bg) {
     drawTriangle(context, shapes[i]);
   }
   shapes = shapes.filter(function (shape) {
-    if (shape.center[1] > height + 500) {
+    if (shape.coords[0][1] > height + 50) {
       return false;
     }
-    return shape.center[0] <= width + 500;
+    return shape.coords[0][0] <= width + 50;
   });
 }
 
@@ -138,9 +140,9 @@ function generateShape(x, y) {
   shape.rotation = rand(0, 360);
   shape.rotationSpeed = rand(1, 10)/100;
   shape.rotationDirection = rand(1, 0) ? 1 : -1;
-  shape.xMov = rand(1, 3);
+  shape.xMov = rand(2, 4);
   shape.xMoveModifier = 0;
-  shape.yMov = rand(2, 4);
+  shape.yMov = rand(3, 5);
   shape.yMoveModifier = 0;
   return shape;
 }

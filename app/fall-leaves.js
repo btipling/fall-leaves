@@ -46,7 +46,7 @@ if (Meteor.isClient) {
     resizeCanvas();
     console.log("the fuck", C_WIDTH, C_HEIGHT);
     context = cd.getContext("2d");
-    baseImage.src = "fall_bg.jpg";
+    baseImage.src = "fall_bg.png";
     baseImage.onload = function(){
       drawSwan(baseImage);
     }
